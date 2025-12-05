@@ -1,0 +1,280 @@
+% Formatage général
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\MakeOuterQuote{"}
+
+% Dimensions
+\usepackage[margin=2cm]{geometry}
+\setlength{\parindent}{0pt}
+
+% Couleurs
+\usepackage{xcolor}
+\definecolor{darkpowderblue}{rgb}{0.0, 0.2, 0.6}
+\definecolor{gamboge}{rgb}{0.89, 0.61, 0.06}
+\definecolor{ece}{RGB}{0, 122, 123}
+\definecolor{verylightgray}{RGB}{240, 240, 240}
+
+% Code listing
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\lstset{
+    language=C,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{verylightgray},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+% Formatage des titres
+\usepackage{titlesec}
+\usepackage{needspace}
+
+\titleformat*{\section}{\needspace{5\baselineskip}\fontsize{18}{18}\bfseries\color{ece}}
+\titlespacing*{\section}{0mm}{8mm}{4mm}
+
+\titleformat*{\subsection}{\needspace{3\baselineskip}\fontsize{14}{14}\bfseries\color{ece}}
+\titlespacing*{\subsection}{0mm}{6mm}{4mm}
+
+\titleformat*{\subsubsection}{\needspace{1\baselineskip}\fontsize{12}{12}\bfseries\color{gamboge}}
+\titlespacing*{\subsubsection}{0mm}{4mm}{4mm}
+
+% En-tête et pied de page
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0pt}
+
+\fancypagestyle{main}{
+    \fancyhead[L]{\includegraphics[width=2cm]{images/ece.png}}
+    \fancyhead[R]{ING4 SE Inter}
+    \fancyfoot[C]{\thepage}
+}
+\pagestyle{main}
+    
+% Page de titre
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+
+% Figures
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[labelfont=bf]{caption}
+
+% Liens
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=darkpowderblue]{hyperref}
+
+\begin{document}
+
+\title{
+    \begin{figure}[htb]
+        \begin{minipage}[t]{.45\textwidth}
+            \centering
+            \includegraphics[width=6cm]{images/ece.png}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{.45\textwidth}
+            \centering
+            \raggedleft\vspace{-12mm}\Large{\textbf{ING4}\\ SE Inter}
+        \end{minipage}  
+    \end{figure}
+    \vspace{2cm}
+    \HRule{1.5pt} \\ [0.5cm]
+    \LARGE \textbf{\Large{TP NOTÉ REPORT}\\ [5mm]
+    \huge{\textcolor{ece}{Multiplayer Game Simulation with Pthreads}}}
+    \HRule{1.5pt} \\ [3mm]
+    
+    \normalsize
+    \vspace{1cm}
+    \fcolorbox{white}{verylightgray}{
+        \begin{minipage}{16cm}
+            \vspace{0.5cm}
+            \textbf{ABSTRACT} -- This report presents a concurrent multiplayer game simulation using C and pthreads. Three players move on a 5x5 grid with power-ups appearing every 3 seconds. Players battle when sharing a cell or collect power-ups to heal. The implementation demonstrates multi-threading, mutex synchronization, and collision detection.
+            \vspace{0.5cm}
+        \end{minipage}}
+    \vfill
+}
+
+\author{
+    Nolan BAYON \and Thomas MARGOTTEAU
+}
+
+\date{
+    We certify that this submission is our own original work,\\
+    and meets the Faculty's Expectation and Originality.\\ [2mm]
+    \textbf{Paris, 05/12/2025}
+}
+
+\maketitle
+
+\newpage
+\tableofcontents
+
+\newpage
+\section{Problem Statement}
+
+The project implements a concurrent multiplayer game with:
+\begin{itemize}
+    \item 3 players moving independently on a 5x5 grid (random directions, 500ms intervals)
+    \item 2 power-ups spawning at random positions (3-second intervals)
+    \item Player battles when sharing a cell (both lose 1-3 HP)
+    \item Health regeneration from power-ups (gain 1-3 HP)
+    \item Thread-safe operations using mutexes
+    \item Termination when any player reaches 0 HP
+\end{itemize}
+
+\section{Sofware Architecture}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/software_architecture.png}
+    \caption{Software Architecure Diagram}
+    \label{fig:placeholder}
+\end{figure}
+    
+
+\section{Memory Analysis}
+
+    \subsection{Size Command Results}
+    
+    \begin{verbatim}
+    $ size bin/displaygamegrid
+       text    data     bss     dec     hex filename
+       5354     720     240    6314    18aa bin/displaygamegrid
+    \end{verbatim}
+    
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|l|r|l|}
+            \hline
+            \textbf{Segment} & \textbf{Size (bytes)} & \textbf{Contents} \\
+            \hline
+            Text (code) & 5,354 & Compiled instructions \\
+            \hline
+            Data (initialized) & 720 & Initialized globals, string literals \\
+            \hline
+            BSS (uninitialized) & 240 & Uninitialized globals \\
+            \hline
+            \textbf{Total} & \textbf{6,314} & \textbf{Static memory} \\
+            \hline
+        \end{tabular}
+        \caption{Memory segments analysis}
+    \end{table}
+    
+    \subsection{Stack Usage by Function}
+    
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|l|r|l|}
+            \hline
+            \textbf{Function} & \textbf{Stack} & \textbf{Variables} \\
+            \hline
+            main() & 32B & player\_ids[3], return addr \\
+            \hline
+            initializePlayers() & 24B & int i, j, unique \\
+            \hline
+            simulateMovement() & 40B & int id, dx, dy, new\_x, new\_y \\
+            \hline
+            generatePowerUps() & 24B & int i, loop control \\
+            \hline
+            checkInteraction() & 32B & int i, j, damage, heal \\
+            \hline
+            displayGame() & 48B & int i, j, idx, char sym \\
+            \hline
+        \end{tabular}
+        \caption{Stack usage per function}
+    \end{table}
+    
+    \textbf{Calculation:} int = 4B, char = 1B, pointer = 8B (64-bit), return address = 8B.
+    
+    \textbf{Max call depth:} main → simulateMovement → checkInteraction = 32 + 40 + 32 = 104B
+    
+    \subsection{Thread Stack}
+    
+    Each pthread receives default stack size (2MB on Linux):
+    \begin{itemize}
+        \item 3 player threads: 3 × 2MB = 6MB
+        \item 1 power-up thread: 1 × 2MB = 2MB
+        \item Main thread: 8MB (typical)
+        \item \textbf{Total thread stacks: ~16MB}
+    \end{itemize}
+    
+    \subsection{Total Memory}
+    
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|l|r|}
+            \hline
+            \textbf{Category} & \textbf{Size} \\
+            \hline
+            Text segment & 5,354 bytes \\
+            Data segment & 720 bytes \\
+            BSS segment & 240 bytes \\
+            Heap (malloc) & 0 bytes \\
+            Thread stacks & ~16 MB \\
+            \hline
+            \textbf{Total} & \textbf{~16.006 MB} \\
+            \hline
+        \end{tabular}
+        \caption{Total memory footprint}
+    \end{table}
+    
+    Most memory (99.96\%) is pthread stack allocation. Program data is only 6.3KB.
+
+\section{Sources}
+
+\begin{itemize}
+    \item TP Noté 2025 - Advanced C Programming. Aakash SONI, ECE Paris
+    \item Advanced C Programming. Course Powerpoint Aakash SONI, ECE Paris
+    \item Claude Sonnet 4.5 using Claude Code CLI
+\end{itemize}
+
+\section{Appendices}
+
+    \subsection{Project Structure}
+    
+    \begin{verbatim}
+    TP_Note_Advanced_C/
+    ├── include/game.h
+    ├── src/
+    │   ├── game.c
+    │   └── displaygamegrid.c
+    ├── bin/displaygamegrid
+    ├── obj/game.o
+    ├── Makefile
+    └── .gitignore
+    \end{verbatim}
+    
+    \subsection{Compilation}
+    
+    \begin{verbatim}
+    # Makefile compilation
+    make all        # Compile
+    make run        # Execute
+    make clean      # Clean
+    
+    # Flags: -Werror -O3 -Iinclude -g
+    \end{verbatim}
+
+    \subsection{Program Output}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{images/program_output.png}
+        \caption{Program running after a few iterations}
+        \label{fig:placeholder}
+    \end{figure}
+\end{document}
