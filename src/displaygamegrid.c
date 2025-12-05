@@ -7,7 +7,9 @@
 void displayGame(Player players[], Position powerUps[]) {
     // Display the grid with the player's position
     
-    system("clear"); // Clear the terminal screen. (Remove this line if you do not see any output on the terminal screen !)
+    if (system("clear") == -1) {
+        fprintf(stderr, "Warning: Failed to clear screen\n");
+    }
 
     for (int i = 0; i < GRID_SIZE; i++) { // Print Grid Row
         for (int j = 0; j < GRID_SIZE; j++) { // Print Grid Column
